@@ -1,7 +1,9 @@
 
-ipSalt = "obnot38Z9KLbwAaB2uwvmjJTNNdG5gzH";
-encryptKey1 = "m59wwebaANHiHzx92pXhu8LgKSEQuqvt";
-encryptKey2 = "DdCAQEkvvcUwXyef9Bz4A4HCx97AnR84";
+let ipSalt = "$rviE85fK@yJk*^@#$8n!AQ&qAWw%!!ZPVRiLi7&v#7uEUjoyrxA&QYwo^bjUEqWDUnh6eFbwKnnwjottpuDiB#3at#g^HM9nbG^Dc8!&5Xv#NgJEECdTt4wtJ84M!P4";
+let encryptKey1 = "RTjjDmLfYnaDTZ6@N!uHsQ*rnGq@Ze*&$*HuVTMYiPcnScU^^MFNg5nyeLT7PWFGoH35hczBA33B!9#3W7#dfHWvy7gex86Cbpwy8zvouatmJyV#Y&xECEV3FKGFxKd@";
+let encryptKey2 = "P$E7oXSTt$!ga&hkz83A4%BfA#%DgTyc8X3mFZh7y7qaA%dg&&!kFGC4x$5jc!3Q48s%q@9Q%j4A*LLsX%9CrK^jJH852VVQSKanWynct!wJ7EcLGMb7dTeRqsQvmdzBm5VdqJy#D5Rima^hhLyryXLZhuxE5#uC%pwfCcn3mY#yGptJ^wrqrhavgcPC3Jru2zYqr!U5*gwwQ84RGz%VHVb6pKBvzzi#5wPHAYsL&wSBN!g_c.z3h(372)kkCHGC3iWEr5iHzCDR^B7aW!ENpC&!FKyjueD5##HBqzLShc3d@Xz#%zzPRRsBHX*oDwqri!djzeDYUiusM9Hhsw3v5$s#j47YbiLbG^yh3j&pp759!GT^9Qm9Lw3MK8woLL3H$@KnhF5Kd";
+
+let origin = window.location.origin;
 
 async function sha256(data) {
     const buffer = new TextEncoder().encode(data);
@@ -12,12 +14,12 @@ async function sha256(data) {
 }
 
 async function getIp() {
-    return await (await fetch(`https://${new URL(window.location.href).hostname}/.nexus/ip`)).text();
+    return await (await fetch(origin + '/.nexus/ip')).text();
 }
 
 async function getChallenge(key) {
     let data = { 'key': key };
-    return await (await fetch(`https://${new URL(window.location.href).hostname}/.nexus/interact`, {
+    return await (await fetch(origin + '/.nexus/interact', {
         "headers": {
             'content-type': 'application/json',
         },
@@ -27,7 +29,7 @@ async function getChallenge(key) {
 }
 
 async function validateSolution(path, body, payload) {
-    return await (await fetch(`https://${new URL(window.location.href).hostname}/.nexus/interact/${path}`, {
+    return await (await fetch(origin + '/.nexus/interact/' + path, {
         "headers": {
             "content-type": "application/json",
             "Payload": payload, "accept": "application/json, text/plain, */*",
@@ -38,7 +40,7 @@ async function validateSolution(path, body, payload) {
 }
 
 async function getPass(token) {
-    return await fetch(`https://${new URL(window.location.href).hostname}/.nexus/request_connector`, {
+    return await fetch(origin + '/.nexus/request_connector', {
         method: 'POST',
         headers: {
             token: token
@@ -73,7 +75,7 @@ async function jsc() {
     let payloadData = {
         'solution': nonce,
         'isBot': false,
-        'jsfp': 'https://discord.com/invite/92p6X2drxn',
+        'jsfp': 'https://discord.gg/keybypass',
         'secret': challenge.secret
     }
     let payload = encodeStrings(encryptKey1, JSON.stringify(payloadData));
@@ -86,7 +88,8 @@ async function jsc() {
     }
     let res = await validateSolution(hashedChallenge, bodyData, payload);
     if (res == "OK") {
-        getPass(hashedChallenge);
+        await getPass(hashedChallenge);
+        window.location.assign(decodeURIComponent(new URL(window.location.href).searchParams.get("destination")));
     }
 }
 
